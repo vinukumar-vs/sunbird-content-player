@@ -35,6 +35,7 @@ node() {
                     sh """
                         #s3 preview deployment
                         export player_version_number=${artifact_version}
+                        export build_number=${BUILD_NUMBER}
                         export filter_plugins=false # For the preview build generation dont split the plugins.
                         cd player
                         npm install
