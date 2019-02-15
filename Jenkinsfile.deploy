@@ -1,1 +1,34 @@
-// Jenkinsfile code goes here
+package Deploy
+node() {
+    try {
+        String ANSI_GREEN = "\u001B[32m"
+        String ANSI_NORMAL = "\u001B[0m"
+        String ANSI_BOLD = "\u001B[1m"
+        String ANSI_RED = "\u001B[31m"
+        String ANSI_YELLOW = "\u001B[33m"
+
+            ansiColor('xterm') {
+                stage('deploy artifact') {
+                    cleanWs()
+                    copyArtifacts projectName: params.absolute_job_path, fingerprintArtifacts: true, flatten: true
+                    artifact_name = sh(returnStdout: true, script: 'jq -r .artifact_name metadata.json').trim()
+                    artifact_version = sh(returnStdout: true, script: 'jq -r .artifact_version metadata.json').trim()
+                    artifact = artifact_name + ":" + artifact_version
+                    sh """
+                       unzip ${artifact}
+                       export player_version_number=${artifact_version}
+                       cd player
+                       mv preview.zip content-player-${player_version_number}.zip
+                       az storage blob upload-batch --destination ${params.container_name}/v3/preview/ --source preview --account-name $azure_account_name --account-key $azure_account_key
+                       az storage blob upload-batch --destination ${params.container_name}/artefacts/content-player/ --source content-player-$player_version_number.zip --account-name $azure_account_name --account-key $azure_account_key
+                       
+                    """
+                    currentBuild.description = "${artifact_version}"
+                }
+            }
+    }
+    catch (err) {
+        currentBuild.result = "FAILURE"
+        throw err
+    }
+}
