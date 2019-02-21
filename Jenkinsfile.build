@@ -43,7 +43,8 @@ node() {
                 stage('ArchiveArtifacts') {
                     sh """
                         mkdir CR_Preview_Artifacts
-                        cp player/preview.zip player/libs.zip CR_Preview_Artifacts
+                        cp player/preview.zip CR_Preview_Artifacts
+                        #cp player/libs.zip CR_Preview_Artifacts
                         zip -j CR_Preview_Artifacts.zip:${artifact_version} CR_Preview_Artifacts/*                      
                     """
                     archiveArtifacts "CR_Preview_Artifacts.zip:${artifact_version}"
