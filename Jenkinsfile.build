@@ -25,7 +25,7 @@ node() {
                 echo "artifact_version: " + artifact_version
 
                 stage('Build') {
-                    sh """#!/bin/bash
+                    sh """
                         #s3 preview deployment
                         export player_version_number=${artifact_version}
                         export player_version_number=1.13.0
