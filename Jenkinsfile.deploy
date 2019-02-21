@@ -19,6 +19,8 @@ node() {
                     sh """
                        unzip ${artifact}
                        echo $artifact_version
+                       player_version_number=${artifact_version}
+                       echo $player_version_number
                     """
                    }
                     currentBuild.description = "${artifact_version}"
