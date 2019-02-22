@@ -20,6 +20,7 @@ node() {
                     sh """
                        unzip ${artifact}
                        #cd player
+                       unzip preview.zip
                        mv preview.zip content-player-${player_version_number}.zip
                        az storage blob upload-batch --destination ${params.container_name}/v3/preview/ --source preview --account-name $azure_account_name --account-key $azure_account_key
                        az storage blob upload-batch --destination ${params.container_name}/artefacts/content-player/ --source content-player-${player_version_number}.zip --account-name $azure_account_name --account-key $azure_account_key
