@@ -10,6 +10,7 @@ node() {
             ansiColor('xterm') {
                 stage('deploy artifact') {
                     cleanWs()
+                    checkout scm
                     copyArtifacts projectName: params.absolute_job_path, fingerprintArtifacts: true, flatten: true
                     artifact_name = sh(returnStdout: true, script: 'jq -r .artifact_name metadata.json').trim()
                     artifact_version = sh(returnStdout: true, script: 'jq -r .artifact_version metadata.json').trim()
