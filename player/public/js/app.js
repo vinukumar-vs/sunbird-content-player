@@ -70,7 +70,7 @@ var app = angular.module("genie-canvas", ["ionic", "ngCordova", "oc.lazyLoad"])
 				GlobalContext.init(packageName, version).then(function (appInfo) {
 					if (typeof localPreview !== "undefined" && localPreview === "local") { return }
 					if (!isbrowserpreview) {
-						org.ekstep.contentrenderer.device()
+						//org.ekstep.contentrenderer.device()
 					}
 				}).catch(function (res) {
 					console.log("Error Globalcontext.init:", res)
