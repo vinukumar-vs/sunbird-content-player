@@ -33,6 +33,10 @@
          var iframe = document.createElement('iframe');
          iframe.src = path;
          this.validateSrc(path, iframe);
+         var instance = this;
+         iframe.contentWindow.addEventListener('message', function(event) {
+            instance.postMessageHandler(event, instance);
+         });
      },
      validateSrc: function(path, iframe) {
          var instance = this;
@@ -80,6 +84,73 @@
          this._super();
          EkstepRendererAPI.dispatchEvent('renderer:next:show')
          EkstepRendererAPI.dispatchEvent('renderer:previous:show')
+     },
+     postMessageHandler: function(event, instance) {
+         try{
+            var postData = event.data;
+            console.log("CP postMessageHandler", postData);
+            var isJSON = true;
+            try {
+                JSON.parse(postData);
+            } catch (e) {
+                isJSON = false;
+            }
+
+            var postMessageData = isJSON ? JSON.parse(postData) : postData.event;
+            // if(isJSON && postMessage.event == 'telemetry'){
+                //to generate telemetry
+                instance.generateTelemetry(postMessageData);
+            //     return;
+            // }
+
+            var eventName = postMessageData.event.toString();
+            window.postMessage(postMessageData.event.toString(), "*");
+         } catch(e) {
+            // Log telemetry error event
+            console.log("Post message failed", e);
+         }
+         
+     },
+     generateTelemetry: function(data) {
+        console.log('generate Telemetry', data);
+        var assessStartEvent = TelemetryService.assess("html.ques.onboarding", undefined, "MEDIUM", {"maxscore":1}).start();
+        var resvalues = [];
+        var feilds = Object.keys(data.data);
+        for (var a = feilds.length, i = 0; i < a; i++) {
+            var obj = {};
+            obj[i] = data.data[feilds[i]];
+            resvalues.push(obj);
+        }
+        var assessData = {
+            pass: true,
+            score: 1,
+            res: resvalues,
+            mmc: [],
+            qindex: 1,
+            mc: [],
+            qtitle: 'HTML question onboarding',
+            qdesc: ""
+        };
+        TelemetryService.assessEnd(assessStartEvent, assessData);
+
+        // if(data.event == 'telemetry') {
+        //     switch(data.type){
+        //         case 'assessmentStart': assessStartEvent = TelemetryService.assess("html.ques.onboarding", undefined, "MEDIUM", {"maxscore":1}).start();
+        //                                 break;
+        //         case 'assess':  var data = {
+        //                             pass: true,
+        //                             score: 1,
+        //                             res: [],
+        //                             mmc: [],
+        //                             qindex: 1,
+        //                             mc: [],
+        //                             qtitle: 'HTML question onboarding',
+        //                             qdesc: ""
+        //                         };
+        //                         TelemetryService.assessEnd(this.assessStartEvent, data);
+        //                         break;
+        //     }
+        // }       
      }
  });
  //# sourceURL=HTMLRendererePlugin.js
